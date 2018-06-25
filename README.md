@@ -1,7 +1,7 @@
 # Simple logbook
 
 This is a simple logbook to gather simple but interesting stuff, including
-algorithms, data structures, networking, and utilities.
+algorithms, data structures, math, networking, and utilities.
 
 ## Organization
 
