@@ -56,3 +56,30 @@ In this method, three packets are required to establish a new TCP connection. Th
 In this method, four packets are required to establish a new TCP connection both endpoints should arrange the initiation before it takes place. It takes between 1 and 1.5 times the round-trip time for this method to complete a connection. This method is not widely used, some intermediate devices don't support it.
 1. The two active openers send an SYN segment with their options and ISN to the other endpoint.
 2. The two active openers acknowledge the received SYN packets and retransmit its own SYN segment.
+
+## Connection Termination
+
+### Connection Close
+
+    Active Closer                                              Passive Closer
+          │                                                           │
+          │                       Data Transfer                       │
+          │ <═══════════════════════════════════════════════════════> │
+          │                                                           │
+          │                                                           │
+          │           FIN + ACK; Seq: N; Ack: M; TCP options          │
+       1  │ ────────────────────────────────────────────────────────> │
+          │                                                           │
+          │             ACK; Seq: M; Ack: N+1; TCP options            │
+          │ <──────────────────────────────────────────────────────── │  2
+          │                                                           │
+          │          FIN + ACK; Seq: M; Ack: N+1; TCP options         │
+          │ <──────────────────────────────────────────────────────── │  3
+          │                                                           │
+          │             ACK; Seq: N; Ack: M+1; TCP options            │
+       4  │ ────────────────────────────────────────────────────────> │
+
+The close operation starts when one of the endpoints wants to terminate the connection or when there is no more data to send. Both sides must complete the termination to close the connection. It takes four packets to clear a TCP connection. It takes about 1.5 times the round-trip time.
+1. The Active Closer send a FIN segment. The FIN packet increases the Sequence Number by one.
+2. The Passive Closer ACKs the FIN segment and notifies the application about the closure. Usually, the application starts with the termination process. The Passive Closer sends a FIN to the Active Closer.
+3. The Active Closer ACKs the last FIN. The FIN is retransmitted until the ACK is received.
