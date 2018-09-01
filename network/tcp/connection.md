@@ -83,3 +83,25 @@ The close operation starts when one of the endpoints wants to terminate the conn
 1. The Active Closer send a FIN segment. The FIN packet increases the Sequence Number by one.
 2. The Passive Closer ACKs the FIN segment and notifies the application about the closure. Usually, the application starts with the termination process. The Passive Closer sends a FIN to the Active Closer.
 3. The Active Closer ACKs the last FIN. The FIN is retransmitted until the ACK is received.
+
+### Simultaneous Close
+
+    Active Closer 1                                             Active Closer 2
+          │                                                           │
+          │                       Data Transfer                       │
+          │ <═══════════════════════════════════════════════════════> │
+          │                                                           │
+          │                                                           │
+          │           FIN + ACK; Seq: N; Ack: M; TCP options          │
+       1  │ ────────────────────────────────────────────────────────> │
+          │                                                           │
+          │           FIN + ACK; Seq: M; Ack: N; TCP options          │
+          │ <──────────────────────────────────────────────────────── │  3
+          │                                                           │
+          │             ACK; Seq: M; Ack: N+1; TCP options            │
+          │ <──────────────────────────────────────────────────────── │  2
+          │                                                           │
+          │             ACK; Seq: N; Ack: M+1; TCP options            │
+       4  │ ────────────────────────────────────────────────────────> │
+
+A simultaneous close is very rare. It is almost like a normal termination just with interleaving segments.
