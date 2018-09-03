@@ -6,6 +6,12 @@ The 4-tuple of source and destination IP addresses and source and destination po
 
 ## Connection establishment
 
+### Initial Sequence Number (ISN)
+
+Actual Operative Systems select the ISN semi-random, for a couple of reasons:
+- A delayed packet from a previous connection might interfere with the new one if the 4-tuple is re-used for a new connection.
+- A third party might forge a segment to interrupt a connection if the Sequence Number is known.
+
 ### Three-way handshake
 
     Active Opener                                              Passive Opener
