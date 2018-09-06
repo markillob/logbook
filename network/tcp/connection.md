@@ -111,3 +111,34 @@ The close operation starts when one of the endpoints wants to terminate the conn
        4  │ ────────────────────────────────────────────────────────> │
 
 A simultaneous close is very rare. It is almost like a normal termination just with interleaving segments.
+
+### Half-Close 
+
+    Active Closer                                              Passive Closer
+          │                                                           │
+          │                       Data Transfer                       │
+          │ <═══════════════════════════════════════════════════════> │
+          │                                                           │
+          │                                                           │
+          │           FIN + ACK; Seq: N; Ack: M; TCP options          │
+       1  │ ────────────────────────────────────────────────────────> │
+          │                                                           │
+          │             ACK; Seq: M; Ack: N+1; TCP options            │
+          │ <──────────────────────────────────────────────────────── │  2
+          │                                                           │
+          │                                                           │
+          │                                                           │
+          │                       Data Transfer                       │
+          │ <════════════════════════════════════════════════════════ │
+          │                                                           │
+          │                                                           │
+          │                                                           │
+          │                                                           │
+          │          FIN + ACK; Seq: O; Ack: N+1; TCP options         │
+          │ <──────────────────────────────────────────────────────── │  3
+          │                                                           │
+          │             ACK; Seq: N; Ack: O+1; TCP options            │
+       4  │ ────────────────────────────────────────────────────────> │
+
+
+An application may close the connection in one direction. Not a usual behavior, but the standard allows it.
