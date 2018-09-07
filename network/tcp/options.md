@@ -19,3 +19,15 @@ Used to align subsequent options to word boundaries. Not strictly necessary.
 - Length: 4
 
 Maximum TCP data the host is willing to accept. Usual values are 1460 for IPv4 and 1440 for IPv6. The MSS defaults to 536 bytes if this option is not present. This option is present only in SYN segments.
+
+## Window Scale (WS)
+- Kind: 3
+- Length: 3
+
+The Window Scale option expands the TCP Window to about 30 bits.  The value of this option left-shifts the window field from 0 to 14 (inclusive), for a maximum window of 1 GB.  WS option is used in SYN segments and should be included in the header even if is set to 0, to advertise the capability to the remote endpoint.
+
+## Timestamps (TSopt)
+- Kind: 8
+- Length: 10
+
+TSopt adds two 4-byte timestamps to measure RTT and for Protection Against Wrapped Sequence (PAWS). The Timestamp Value (TSval) is included in data and ACK segments and just echoed in the TimeStamp Echo Reply (TSecr) by the other endpoint. The timestamp is a monotonically non-decreasing value. The negotiation of this TCP option happens during the connection establishment (SYN, SYN/ACK segments) and use during the rest of the connection.
