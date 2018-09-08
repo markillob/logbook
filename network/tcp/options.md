@@ -49,3 +49,9 @@ TSopt adds two 4-byte timestamps to measure RTT and for Protection Against Wrapp
 - Length: 8
 
 The Quick-Start is an experimental option that requests a higher initial congestion window or after a connection was idle. It requires all middleboxes along the path approving the use of a larger congestion window. The sender sets a random QS TTL and calculates the difference from the IP TTL value. A router along the path decrements the QS TTL to indicate the router agrees with the higher congestion window, otherwise forward the QS TTL without modification. The endpoint echoes the difference from the QS TTL and IP TTL back to the sender. When the difference is the same as the original calculation it is possible to use a higher initial congestion window.
+
+## User Timeout (UTO)
+- Kind: 28
+- Length: 4
+
+The UTO option allows one endpoint to advertise its current user timeout value. The other end of the connection can adapt its timeout with the information. A high value allows the connection to survive for extended periods of inactivity. A busy host might use a short value to tell the other endpoint it will maintain the connection for a short time. The values advertised are advisory, the other end doesn't need to comply.
