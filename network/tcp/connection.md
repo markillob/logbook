@@ -142,3 +142,90 @@ A simultaneous close is very rare. It is almost like a normal termination just w
 
 
 An application may close the connection in one direction. Not a usual behavior, but the standard allows it.
+
+## Connection states
+
+                                       ┌─────────────────────────────────────────────────┐
+                                       │                                                 │
+                                       V          Active Open                            │
+                                ┌─────────────┐    Send: SYN                             │
+                  Passive Open  │             │════════════════════╗                     │
+               ┌────────────────│   CLOSED    │                    ║                     │
+               │                │             │<------------┐      ║                     │
+               │                └─────────────┘             |      ║                     │
+               │                                   Close or |      ║                     │
+               │                                   Timeout  |      ║                     │
+               │                                            |      ║                     │
+               V                                            |      V                     │
+        ┌─────────────┐                                 ┌─────────────┐                  │
+        │             │            Send: SYN            │             │                  │
+        │   LISTEN    │-------------------------------->│  SYN-SENT   │                  │
+        │             │                                 │             │                  │
+        └─────────────┘                                 └─────────────┘                  │
+            Λ     │                                         |      ║                     │
+            |     │                                         |      ║                     │
+      Recv: |     │ Recv: SYN                 Recv: SYN     |      ║                     │
+        RST |     │ Send: SYN+ACK             Send: SYN+ACK |      ║                     │
+            |     │                                         |      ║                     │
+            |     V                                         |      ║                     │
+        ┌─────────────┐                    Simultaneous     |      ║                     │
+        │             │                        Open         |      ║                     │
+        │  SYN-RECV   │<------------------------------------┘      ║                     │
+        │             │                                            ║                     │
+        └─────────────┘                                            ║                     │
+           |       │                                               ║                     │
+           |       │                                               ║                     │
+           |       │ Recv:                                         ║ Recv: SYN+ACK       │
+           |       │ ACK                                           ║ Send: ACK           │
+           |       │                                               ║                     │
+           |       │                                               ║                     │
+           |       │            ┌─────────────┐                    ║                     │
+           |       │            │             │                    ║                     │
+           |       └───────────>│ ESTABLISHED │<═══════════════════╝                     │
+           | Close              │             │                                          │
+           | Send:              └─────────────┘                                          │
+           | FIN                   ║       │                                             │
+           |                       ║       │ Recv: FIN                                   │
+           |       ╔═══════════════╝       │ Send: ACK                       Pasive      │
+           |       ║                       │                                  Close      │
+           |       ║                       V                                             │
+           |       ║            ┌─────────────┐              ┌─────────────┐             │
+           |       ║ Close      │             │    Close     │             │  Recv: ACK  │
+           |       ║ Send:      │ CLOSE_WAIT  │─────────────>│  LAST-ACK   │────────────>┤
+           |       ║ FIN        │             │  Send: FIN   │             │             │
+           |       ║            └─────────────┘              └─────────────┘             │
+           |       ║                                                                     │
+           |       ║                                                                     │
+           |       ║                                                                     │
+           |       ║     Recv:  ┌─────────────┐                                          │
+           |       ║     ACK    │             │                              Active      │
+           |       ║     ╔═════>│ FIN-WAIT-2  │══╗                            Close      │
+           |       ║     ║      │             │  ║ Recv: FIN                             │
+           V       V     ║      └─────────────┘  ║ Send: ACK                             │
+        ┌─────────────┐══╝                       ╚══════════>┌─────────────┐             │
+        │             │     Recv: FIN+ACK                    │             │             │
+        │ FIN-WAIT-1  │------------------------------------->│  TIME-WAIT  │════════════>┘
+        │             │     Send: ACK                        │             │
+        └─────────────┘──┐                             ┌────>└─────────────┘
+                         │ Recv: FIN  ┌─────────────┐  │
+                         │ Send: ACK  │             │  │               Simultaneous
+                         └───────────>│   CLOSING   │──┘                      Close
+                                      │             │  Recv:
+                                      └─────────────┘  ACK
+
+        Single       lines (═) represents typical server transitions
+        Double       lines (─) represents typical client transitions
+        Disconnected lines (-) represents not very common transitions
+
+During its lifetime the TCP connection transition through different states:
+- Listen: Waiting from a connection request from a remote endpoint
+- SYN-Sent: Waiting from a matching connection request after having sent a connection request.
+- SYN-Received: Waiting for the acknowledgment of the connection request after having received and sent a connection request.
+- Established: An working connection. In this phase, the applications can exchange data.
+- FIN-Wait-1: Waiting for the connection termination request from the other endpoint or the acknowledgment of the connection termination request previously sent.
+- FIN-Wait-2: Waiting for a connection termination request from the other endpoint.
+- Closing: Waiting for a connection termination request acknowledgment from a remote TCP.
+- Time-Wait: Waiting for twice the Maximum Segment Lifetime (MSL) to be sure the remote endpoint receives the acknowledgment for its connection termination request.
+- Close-Wait: Waiting for a connection termination request from the local user.
+- Last-ACK: Waiting for an acknowledgment for the connection termination request previously sent.
+- Closed: Fictional state representing no connection.
