@@ -26,6 +26,18 @@ Maximum TCP data the host is willing to accept. Usual values are 1460 for IPv4 a
 
 The Window Scale option expands the TCP Window to about 30 bits.  The value of this option left-shifts the window field from 0 to 14 (inclusive), for a maximum window of 1 GB.  WS option is used in SYN segments and should be included in the header even if is set to 0, to advertise the capability to the remote endpoint.
 
+## Selective Acknowledgement Permitted (SACK-Permitted)
+- Kind: 4
+- Length: 2
+
+This TCP option informs the Selective Acknowledgment capability of the sender. TCP's cumulative acknowledgment mechanism doesn't allow to ACK non-contiguous data. The SACK option allows acknowledging data even if is not contiguous. Only the SYN segments carry the SACK-permitted option.
+
+## Selective Acknowledgement (SACK)
+- Kind: 5
+- Length: Variable
+
+The SACK option is a range of sequence numbers which represents the data blocks received. Each data block consists of two 32-bits sequence numbers. Each SACK block would consume 8 bytes, so a TCP header having n SACK blocks would be 8n+2 bytes long. When used SACK with Timestamps option up to 3 SACK blocks can be included in the TCP header.
+
 ## Timestamps (TSopt)
 - Kind: 8
 - Length: 10
