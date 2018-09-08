@@ -43,3 +43,9 @@ The SACK option is a range of sequence numbers which represents the data blocks 
 - Length: 10
 
 TSopt adds two 4-byte timestamps to measure RTT and for Protection Against Wrapped Sequence (PAWS). The Timestamp Value (TSval) is included in data and ACK segments and just echoed in the TimeStamp Echo Reply (TSecr) by the other endpoint. The timestamp is a monotonically non-decreasing value. The negotiation of this TCP option happens during the connection establishment (SYN, SYN/ACK segments) and use during the rest of the connection.
+
+## Quick-Start Response (QS)
+- Kind: 27
+- Length: 8
+
+The Quick-Start is an experimental option that requests a higher initial congestion window or after a connection was idle. It requires all middleboxes along the path approving the use of a larger congestion window. The sender sets a random QS TTL and calculates the difference from the IP TTL value. A router along the path decrements the QS TTL to indicate the router agrees with the higher congestion window, otherwise forward the QS TTL without modification. The endpoint echoes the difference from the QS TTL and IP TTL back to the sender. When the difference is the same as the original calculation it is possible to use a higher initial congestion window.
