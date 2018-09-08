@@ -44,6 +44,12 @@ The SACK option is a range of sequence numbers which represents the data blocks 
 
 TSopt adds two 4-byte timestamps to measure RTT and for Protection Against Wrapped Sequence (PAWS). The Timestamp Value (TSval) is included in data and ACK segments and just echoed in the TimeStamp Echo Reply (TSecr) by the other endpoint. The timestamp is a monotonically non-decreasing value. The negotiation of this TCP option happens during the connection establishment (SYN, SYN/ACK segments) and use during the rest of the connection.
 
+## TCP MD5 Signature Option (TCP-MD5)
+- Kind: 19
+- Length: 18
+
+The TCP-MD5 option uses the MD5 cryptographic hash algorithm along with a secret key known to both endpoints to authenticate each segment. This option doesn't provide a key management solution, so the secret key must be shared prior to the TCP connection. The remote end can verify the received segment wasn't modified in transit. The TCP-AO option obsoletes this option.
+
 ## Quick-Start Response (QS)
 - Kind: 27
 - Length: 8
@@ -55,3 +61,9 @@ The Quick-Start is an experimental option that requests a higher initial congest
 - Length: 4
 
 The UTO option allows one endpoint to advertise its current user timeout value. The other end of the connection can adapt its timeout with the information. A high value allows the connection to survive for extended periods of inactivity. A busy host might use a short value to tell the other endpoint it will maintain the connection for a short time. The values advertised are advisory, the other end doesn't need to comply.
+
+## TCP Authentication Option (TCP-AO)
+- Kind: 29
+- Length: Variable
+
+The TCP-AO option uses a cryptographic hash algorithm along with a secret key known to both endpoints to authenticate each segment. This option doesn't provide a key management solution, so the secret key must be shared prior to the TCP connection. The remote end can verify the received segment wasn't modified in transit. This option obsoletes the TCP-MD5 option being extensible to support new cryptographic algorithms.
