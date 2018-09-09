@@ -143,6 +143,26 @@ A simultaneous close is very rare. It is almost like a normal termination just w
 
 An application may close the connection in one direction. Not a usual behavior, but the standard allows it.
 
+### Reset (RST) segments
+
+A segment with the RST bit set is called reset. When a packet arrives for an unknown connection, the endpoint sends a reset. Resets usually teardown a connection and its associated resources.
+
+#### Connection to a non-listening port
+
+A host will reply with a reset segment if the host receives a packet for a non-listening port.
+
+#### Abort a connection
+
+A reset segment can be used to tear down a connection and free the connection resources quickly. The stack discards the application data when sending or receiving a reset.
+
+#### Half-Open connections
+
+A connection is half-open when one host closes the connection without the remote endpoint knowing about it. A typical scenario for a half-open connection is a system crash. If the host with the active connection sends a segment, the endpoint with the closed connection will reply with a reset.
+
+#### TIME-WAIT Assassination (TWA)
+
+To avoid a duplicated packet desynchronizes a new TCP connection the TIME-WAIT status lingers the old connection twice the Maximum Segment Lifetime. A reset packet would teardown the connection prematurely and might expose a new connection to desynchronization. A host will ignore a reset packet received during the TIME-WAIT status to avoid desynchronization of a new connection.
+
 ## Connection states
 
                                        ┌─────────────────────────────────────────────────┐
