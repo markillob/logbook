@@ -28,5 +28,8 @@ The TSOPT allows measuring the RTT continuously. The sender sets its TCP clock i
 4. When the receiver generates an acknowledgment with TSOPT the receiver set the TSER value to the last valid TSV from the sender.
 5. The sender receiving the acknowledgment substracts the TSER from its TCP clock to calculate the RTT.
 
-When using the TSOPT to calculate the RTT there is no need to implement the first step of the Karn's algorithm.
+The TSOPT algorithm works even in cases of reordering and retransmissions:
+- **Out-of-order segments:** When a receiver receives an out-of-order segment it will generate an acknowledgment immediately to trigger the fast retransmit at the sender. This ACK includes as its TSER value the TSV of the most recent in-order segment. This usually causes the sender to increase the RTT measure, therefore increase its RTO.
+- **Retransmission:** When a receiver receives a retransmitted segment the acknowledge generated includes as its TSER value the TSV of the retransmitted segment. This causes the RTT value on the sender to go down, therefore decrease its RTO.
 
+When using the TSOPT to calculate the RTT there is no need to implement the first step of the Karn's algorithm.
