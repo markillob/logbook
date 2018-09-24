@@ -33,3 +33,17 @@ The TSOPT algorithm works even in cases of reordering and retransmissions:
 - **Retransmission:** When a receiver receives a retransmitted segment the acknowledge generated includes as its TSER value the TSV of the retransmitted segment. This causes the RTT value on the sender to go down, therefore decrease its RTO.
 
 When using the TSOPT to calculate the RTT there is no need to implement the first step of the Karn's algorithm.
+
+## Methods to calculate the RTO
+
+### RFC 793 method to set the RTO
+
+The RFC 798 uses a smoothed round-trip time estimator (SRTT) to calculates the retransmission timeout:
+
+SRTT = α(SRTT) + (1-α)RTTs
+
+The recommended value for α is a value between 0.8 and 0.9. The newly estimated consists of 80% to 90% from the previous estimate and 10% to 20% of the new sample. This average is also called Exponentially Weighted Moving Average (EWMA). Given the SRTT the recommended RTO is set to the following:
+
+RTO = min(ubound, max(lbound, β(SRTT) )
+
+β is a delayed variance factor recommended between 1.3 to 2.0. ubond is the upper bound (suggested to 60 seconds), and lbound is the lower bound (recommended to 1 second). For a stable RTT this method works fine, but not for networks with highly variable RTT such as wireless networks.
